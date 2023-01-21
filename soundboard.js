@@ -246,7 +246,7 @@ class SoundBoard {
     }
 
     static async playSoundByName(name, push = true) {
-        if (!game.user.isGM) {
+        if (!game.user.isGM && !game.user.isTrusted) {
             this.socketHelper.sendData({type: SBSocketHelper.SOCKETMESSAGETYPE.REQUESTMACROPLAY, payload: name});
             return;
         }
@@ -850,7 +850,7 @@ class SoundBoard {
     }
 
     static async refreshSounds({notify, bringToTop} = {notify: true, bringToTop: true}) {
-        if (game.user.isGM) {
+        if (game.user.isGM || game.user.isTrusted) {
             if (notify) {
                 ui.notifications.notify(game.i18n.localize('SOUNDBOARD.notif.refreshing'));
             }
@@ -999,7 +999,7 @@ class SoundBoard {
             };
         }
 
-        if (game.user.isGM) {
+        if (game.user.isGM || game.user.isTrusted) {
             SoundBoard.soundsError = false;
             await SoundBoard.getSounds();
             Handlebars.registerHelper(SoundBoard.handlebarsHelpers);
@@ -1035,12 +1035,12 @@ class SoundBoard {
     }
 
     static addSoundBoard(controls) {
-        let soundControls = controls.find(control => control.name === 'sounds');
+        let soundControls = controls.find(control => control.name === 'token');
         soundControls.tools.push({
             name: 'soundboard',
             title: game.i18n.localize('SOUNDBOARD.button.openSoundboard'),
             icon: 'fas fa-border-all',
-            visible: game.user.isGM,
+            visible: game.user.isGM || game.user.isTrusted,
             onClick: SoundBoard.openSoundBoard,
             button: true
         });
@@ -1048,7 +1048,7 @@ class SoundBoard {
             name: 'soundboardfav',
             title: game.i18n.localize('SOUNDBOARD.button.openSoundboardFav'),
             icon: 'fas fa-star',
-            visible: game.user.isGM,
+            visible: game.user.isGM || game.user.isTrusted,
             onClick: SoundBoard.openSoundBoardFav,
             button: true
         });
@@ -1056,7 +1056,7 @@ class SoundBoard {
             name: 'soundboardbundled',
             title: game.i18n.localize('SOUNDBOARD.button.openSoundboardBundled'),
             icon: 'fas fa-box-open',
-            visible: game.user.isGM,
+            visible: game.user.isGM || game.user.isTrusted,
             onClick: SoundBoard.openSoundBoardBundled,
             button: true
         });
@@ -1064,7 +1064,7 @@ class SoundBoard {
             name: 'soundboardstop',
             title: game.i18n.localize('SOUNDBOARD.button.stopAllTool'),
             icon: 'far fa-stop-circle',
-            visible: game.user.isGM,
+            visible: game.user.isGM || game.user.isTrusted,
             onClick: SoundBoard.stopAllSounds,
             button: true
         });
@@ -1072,14 +1072,14 @@ class SoundBoard {
             name: 'soundboardpackman',
             title: game.i18n.localize('SOUNDBOARD.button.packageManagerTool'),
             icon: 'fas fa-tasks',
-            visible: game.user.isGM,
+            visible: game.user.isGM || game.user.isTrusted,
             onClick: () => SoundBoard.openSoundBoardPackageManager(SoundBoard.packageManager),
             button: true
         });
     }
 
     static addCustomPlaylistElements(app, html) {
-        if (!game.user.isGM) {
+        if (!game.user.isGM && !game.user.isTrusted) {
             return;
         }
         if (app.options.id === 'playlists') {
